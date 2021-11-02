@@ -1,0 +1,2 @@
+HighLevel 0 V
+LowLevel -3.3 V

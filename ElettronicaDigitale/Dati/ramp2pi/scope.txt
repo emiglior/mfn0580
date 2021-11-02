@@ -1,0 +1,6 @@
+Clock 1kHz
+Segnale:
+Freq 6.283 Hz
+HighL 0 V
+LowL -3.3 V
+Symm 100%

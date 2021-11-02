@@ -1,0 +1,2 @@
+HighLevel -150 mV
+LowLevel -3 V

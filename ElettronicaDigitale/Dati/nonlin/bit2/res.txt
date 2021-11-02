@@ -1,0 +1,8 @@
+4.6 kOhm
+In parallelo al bit 2 partendo dal meno significativo
+
+Clock 1 kHZ
+Freq 3.1415 Hz --- 6.283 Hz --- 9.42478 Hz
+HighL -75 mV
+LowL -3.4 V
+Symm 50%
