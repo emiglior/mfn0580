@@ -13,10 +13,14 @@ using namespace std;
     Comando da terminale:
     root -l
     .x DNLramp.cpp+("nome_del_file.txt")
+
+    Authors: Ernesto Migliore, Michele Risino
+    Dipartimento di Fisica - Universita` di Torino
+    Created: 2021.06.15
 */
 void DNLramp(const char *nomeFile)
 {
-    //LETTURA DEI DATI DAL FILE DI TESTO IN UN VECTOR, IGNORANDO I TEMPI
+    // Lettura dei dati dal file di testo in un std::vector, ignorando i tempi
     string valore;
     vector<double> codici;
     try
@@ -34,7 +38,7 @@ void DNLramp(const char *nomeFile)
         return;
     }
 
-    //ISTOGRAMMA DELLE FREQUENZE DI CIASCUN CODICE NEL SET DI DATI
+    // Istogramma delle frequenze di ciascun codice nel set di dati
     TCanvas *c = new TCanvas(nomeFile, nomeFile, 200, 10, 600, 400);
     TH1 *h = new TH1I(nomeFile, "", 16, -0.5, 15.5);
     h->FillN(codici.size(), &codici[0], 0);
