@@ -14,7 +14,7 @@
 #include <SPI.h>
 #include <SD.h>
 
-const String VERSION = " v1.0"; // current version 
+const String VERSION = " v1.1"; // current version 
 
 const int TRIGGER_PIN = 6; //pin connected to shift register Q_F to trigger acquisition events
 const int TOGGLE_PIN = 7;  //pin connected to the "toggle acquisition" button (active HIGH)
@@ -32,9 +32,15 @@ void setup() {
   //print sketch name and version 
   Serial.begin(9600);
   if (Serial) Serial.println( __FILE__ + VERSION );
+  //SD card stuff
+  checkSDCard();
+}
+
+
+void checkSDCard(){
   //check good wiring and SD card presence
   sdInitOk = SD.begin(CS_PIN);
-  //move fileCount to next available number
+ //move fileCount to next available number
   if (sdInitOk)
   {
     fileCount = 1;
@@ -95,7 +101,7 @@ void checkToggle()
 }
 
 void loop() {
-  while (!sdInitOk) setup(); //look for the sd card until it is found
+  while (!sdInitOk) checkSDCard(); //look for the sd card until it is found
   if (active) acquireData();
   checkToggle(); //always check if the toggle button has been pressed
   if (digitalRead(CD_PIN) == LOW) sdInitOk = false; //if the card has been disconnected, revert to attempting setup

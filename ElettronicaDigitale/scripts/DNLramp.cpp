@@ -18,7 +18,7 @@ using namespace std;
     Dipartimento di Fisica - Universita` di Torino
     Created: 2021.06.15
 */
-void DNLramp(const char *nomeFile)
+void DNLramp(const char *nomeFile, bool verbose=false)
 {
     // Lettura dei dati dal file di testo in un std::vector, ignorando i tempi
     string valore;
@@ -37,6 +37,8 @@ void DNLramp(const char *nomeFile)
         cout << "File non trovato o formato del file non supportato" << endl;
         return;
     }
+
+    if (verbose) cout << "File letto: " << codici.size() << endl;
 
     // Istogramma delle frequenze di ciascun codice nel set di dati
     TCanvas *c = new TCanvas(nomeFile, nomeFile, 200, 10, 600, 400);

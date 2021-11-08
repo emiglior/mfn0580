@@ -15,8 +15,7 @@
 using namespace std;
 
 // Minimo e massimo dell'intervallo di frequenze in cui cercare quella campionata
-const double MIN_FREQ = 1;    // [Hz]
-const double MAX_FREQ = 140.; // [Hz]
+const double MIN_FREQ = 0.;    // [Hz]
 
 /*
     Effettua fit sinusoidali sui dati contenuti nel file specificato.
@@ -31,7 +30,7 @@ const double MAX_FREQ = 140.; // [Hz]
     Dipartimento di Fisica - Universita` di Torino
     Created: 2021.06.15
 */
-void nyquist(const char *nomeFile, bool verbose=false)
+void nyquist(const char *nomeFile,  const double sampling_freq, bool verbose=false)
 {
     // Lettura dei dati dal file di testo in due std::vector<double>
     string valore;
@@ -61,6 +60,8 @@ void nyquist(const char *nomeFile, bool verbose=false)
         return;
     }
 
+    if (verbose) cout << "File letto: " << tempi.size() << endl;
+
     // Creazione degli array delle incertezze sulle misure
     double err_codici[tempi.size()], err_tempi[tempi.size()], zeri[tempi.size()];
     for (unsigned int i = 0; i < tempi.size(); i++)
@@ -78,13 +79,14 @@ void nyquist(const char *nomeFile, bool verbose=false)
     double codiceMinimo = TMath::MinElement(codici.size(), &codici[0]);
     double codiceMassimo = TMath::MaxElement(codici.size(), &codici[0]);
     double ampiezza = (codiceMassimo - codiceMinimo) * 0.5;
-    double offset = (codiceMassimo + codiceMinimo) * 0.5, frequenza = MIN_FREQ;
+    double offset = (codiceMassimo + codiceMinimo) * 0.5;
+    double frequenza = MIN_FREQ;
     vector<double> frequenzeMigliori;
-    while (frequenza <= MAX_FREQ) // Prova frequenze tra MIN_FREQ e MAX_FREQ a step di 0.25 Hz
+    while (frequenza <= 0.5*sampling_freq) // Prova frequenze fino a 1/2 frequenza di sampling in step di 0.25 Hz
     {
         fit->SetParameters(ampiezza, frequenza, 0., offset);
         g0->Fit("fit", "RQ");
-        if (verbose) cout << "Frequenza [Hz]:" << frequenza << "; Chi^2 fit: " << fit->GetChisquare() << "\n";
+        if (verbose) cout << "Scan in frequenza: frequenza [Hz]: " << frequenza << "; Chi^2 fit: " << fit->GetChisquare() << endl;
         if (fit->GetProb() >= 0.95) frequenzeMigliori.push_back(frequenza);
         frequenza += 0.25; // [Hz]
     }
@@ -102,6 +104,7 @@ void nyquist(const char *nomeFile, bool verbose=false)
     for (unsigned int i = 0; i < frequenzeMigliori.size(); i++)
     {
         string nomeCanvas = string(nomeFile) + "_" + to_string(i + 1);
+        if (verbose) cout << nomeCanvas << "  fit final per freq: " << frequenzeMigliori[i] << endl;
         TCanvas *c = new TCanvas(nomeCanvas.c_str(), nomeCanvas.c_str(), 200, 10, 600, 400);
         TGraphErrors *g = new TGraphErrors(tempi.size(), &tempi[0], &codici[0], &err_tempi[0], &err_codici[0]);
         fit->SetParName(0,"A_{pp} [cnt]");
@@ -122,9 +125,12 @@ void nyquist(const char *nomeFile, bool verbose=false)
         mg->Add(g);
     }
 
-    c_all->cd();
-    //gStyle->SetOptFit(0);
-    mg->Draw("AP");
-    mg->GetHistogram()->GetXaxis()->SetTitle("[s]");
-    mg->GetHistogram()->GetYaxis()->SetTitle("[cnt]");
+    // Draw TMultiGraph solo se ci sono fit OK
+    if ( frequenzeMigliori.size() > 0 ) {
+      c_all->cd();
+      //gStyle->SetOptFit(0);
+      mg->Draw("AP");
+      mg->GetHistogram()->GetXaxis()->SetTitle("[s]");
+      mg->GetHistogram()->GetYaxis()->SetTitle("[cnt]");
+    }
 }
