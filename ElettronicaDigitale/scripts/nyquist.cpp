@@ -24,7 +24,7 @@ const double MIN_FREQ = 0.;    // [Hz]
     se nessun fit converge, provare a cambiare MIN_FREQ da 1. a 1.125 Hz o viceversa.
     Comando da terminale:
     root -l
-    .x nyquist.cpp+("nome_del_file.txt")
+    .x nyquist.cpp+("nome_del_file.txt", frequenza_campionamento)
 
     Authors: Ernesto Migliore, Michele Risino
     Dipartimento di Fisica - Universita` di Torino
