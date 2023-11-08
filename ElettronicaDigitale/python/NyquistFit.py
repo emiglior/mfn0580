@@ -7,12 +7,17 @@ import numpy
 import math
 import os
 
+import ascii_helpers as AH
+
 from optparse import OptionParser
 
 parser = OptionParser()
 parser.add_option("-f", "--file",
                       action="store", type="string", dest="input_filename", default='DATA1.txt',
                       help="input data file")
+parser.add_option("-s", "--freq_sampling",
+                      action="store", type="float", dest="freq_sampling", default=200.,
+                      help="sampling frequency [Hz]")
 parser.add_option("-v", "--verbose",
                       action="store_true", dest="verbose", default=False,
                       help="verbose print-out")
@@ -21,21 +26,14 @@ parser.add_option("-v", "--verbose",
 
 times = array.array('d')
 codes = array.array('d')
-err_times_null = array.array('d')
-err_times = array.array('d')
-err_codes = array.array('d')
 
 # input ASCII file (from Arduino DAQ)
-topdir = '/Users/migliore/Documents/didattica/2021/Laboratorio Elettronica/ArduinoADC'
-f = open(os.path.join(topdir,options.input_filename), 'r')
-for _line in f:
-      s0, s1 =  _line.split(",")
-      times.append( float(s0) )
-      codes.append( float(s1) )
-      err_times_null.append(0.)
-      err_times.append(0.0001)  # 0.1 ms
-      err_codes.append(0.5)     # 0.5 ADC counts
-f.close()
+topdir = '/Users/migliore/Documents/didattica/2022/Laboratorio Elettronica/mfn0580/ElettronicaDigitale'
+times, codes = AH.read_file(os.path.join(topdir,options.input_filename))
+
+err_times_null = array.array('d', [0.0]*len(times))
+err_times = array.array('d', [0.0001]*len(times)) # 0.1 ms
+err_codes = array.array('d', [0.5]*len(times))    # 0.5 ADC counts
 
 if options.verbose:
     print( 'MIN/MAX code {0:3.0f} {1:3.0f} MIN/MAX time {2:10.6f} {3:10.6f}'.format( min(codes), max(codes), min(times), max(times)) )
@@ -49,8 +47,8 @@ p0 = 0.5 * (max(codes)-min(codes)) # amplitude
 p3 = 0.5 * (max(codes)+min(codes)) # offset
 
 # step #1: scan frequency parameter
-freq_min =   10. # [Hz]
-freq_max =  110. # [Hz]
+freq_min =    0. # [Hz]
+freq_max =  0.5*options.freq_sampling # [Hz]
 freq_bins =   4
 freq_list = numpy.linspace( freq_min, freq_max, 1+freq_bins*int(freq_max-freq_min) )
 chi2_min = float('inf')
